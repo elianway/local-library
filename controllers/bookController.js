@@ -1,6 +1,29 @@
+const { PrismaClient } = require('@prisma/client')
+
+const prisma = new PrismaClient()
+const async = require('async')
+
 exports.index = function(req, res) {
-    res.send('NOT IMPLEMENTED: Site Home Page');
-};
+    async.parallel({
+        book_count: function(callback) {
+            prisma.book.findMany({}, callback)
+        },
+        book_instance_count: function(callback) {
+            prisma.bookinstance.findMany({}, callback)
+        },
+        book_instance_available_count: function(callback) {
+            prisma.bookinstance.findMany({status:'Available'}, callback)
+        },
+        author_count: function(callback) {
+            prisma.author.findMany({}, callback)
+        },
+        genre_count: function(callback) {
+            prisma.genre.findMany({}, callback)
+        }
+    }, function(err, results) {
+        res.render('index', { title: 'Local Library Home', error: err, data: results })
+    })
+}
 
 // Display list of all books.
 exports.book_list = function(req, res) {
