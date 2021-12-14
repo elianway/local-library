@@ -1,6 +1,17 @@
+const { PrismaClient } = require('@prisma/client')
+
+const prisma = new PrismaClient()
+
 // Display list of all Genre.
-exports.genre_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre list');
+exports.genre_list = function(req, res, next) {
+    prisma.genre.findMany({
+        orderBy: {
+            name: 'asc',
+        },
+    }, function(err, list_genre) {
+        if (err) { next(err); }
+        res.render('genre_list', { title: 'Genre List', genre_list: list_genre });
+    });
 };
 
 // Display detail page for a specific Genre.

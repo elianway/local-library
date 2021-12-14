@@ -1,0 +1,18 @@
+<%- includes('layout'); %>
+      <div class='genre-list'>
+        <h1><%= title %></h1>
+        <ul>
+          <%if (Object.keys(genre_list).length > 0) { %>
+            <% genre_list.forEach((genre) => { %>
+              <li>
+                <a href=<%= genre.id %><%= genre.name %></a>
+              </li>
+            <%}) %>
+          <%} else { %>
+              <p>There are no authors</p>
+          <%} %>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
