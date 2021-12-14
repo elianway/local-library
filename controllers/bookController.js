@@ -32,6 +32,9 @@ exports.index = function(req, res) {
 // Display list of all books.
 exports.book_list = function(req, res, next) {
     prisma.book.findMany({
+        orderBy: {
+            title: 'asc',
+        },
         select: {
             title: true,
             author: true,

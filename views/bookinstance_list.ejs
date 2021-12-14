@@ -1,0 +1,27 @@
+<%- includes('layout'); %>
+      <div class='bookinstance-list'>
+        <h1><%= title %></h1>
+        <ul>
+          <%if (Object.keys(bookinstance_list).length > 0) { %>
+            <% bookinstance_list.forEach((instance) => { %>
+              <li>
+                <a href=<%= instance.id %><%= instance.book.title %><%= instance.imprint%></a>
+                <% if (instance.status=='AVAILABLE') { %>
+                  <span class='text-success'><%= instance.status %></span>
+                <%} else if (instance.status=='MAINTENANCE') { %>
+                  <span class='text-danger'><%= instance.status %></span>
+                <%} else { %>
+                  <span class='text-warning'><%= instance.status %></span>
+                <% } %>
+                <% if (instance.status!='AVAILABLE') { %>
+                  <span>Due: <%= instance.due %></span>
+                <%} %>
+              </li>
+            <%}) %>
+          <%} %>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
+
