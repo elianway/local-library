@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
+const async = require('async');
 
 // Display list of all Genre.
 exports.genre_list = function(req, res, next) {
@@ -15,8 +16,31 @@ exports.genre_list = function(req, res, next) {
 };
 
 // Display detail page for a specific Genre.
-exports.genre_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre detail: ' + req.params.id);
+exports.genre_detail = function(req, res, next) {
+    async.parallel({
+        genre: function(callback) {
+            prisma.genre.findUnique({
+                where: {
+                    id: req.params.id
+                },
+            });
+        },
+        genre_books: function(callback) {
+            prisma.book.findMany({
+                where: {
+                    genId: req.params.id
+                },
+            });
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        if (results.genre==null) {
+            const err = new Error('Genre not found');
+            err.status = 404;
+            return next(err);
+        }
+        res.render('genre_detail', { title: 'Genre Detail', genre: results.genre, genre_books: results.genre_books });
+    });        
 };
 
 // Display Genre create form on GET.
