@@ -12,7 +12,11 @@ exports.index = function(req, res) {
             prisma.bookinstance.findMany({}, callback)
         },
         book_instance_available_count: function(callback) {
-            prisma.bookinstance.findMany({status:'Available'}, callback)
+            prisma.bookinstance.findMany({
+                where: {
+                  status: 'Available'
+                },
+            }, callback)
         },
         author_count: function(callback) {
             prisma.author.findMany({}, callback)
@@ -26,8 +30,18 @@ exports.index = function(req, res) {
 }
 
 // Display list of all books.
-exports.book_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book list');
+exports.book_list = function(req, res, next) {
+    prisma.book.findMany({
+        select: {
+            title: true,
+        },
+        include: {
+            author: true,
+        },
+    }, function(err, list_books) {
+        if (err) { return next(err); }
+        res.render('book_list', { title: 'Book List', book_list: list_books });
+    });
 };
 
 // Display detail page for a specific book.
