@@ -6,7 +6,7 @@
             <% book_list.forEach((book) => { %>
               <li>
                 <a href=<%= book.id %><%= book.title %></a>
-                <p><%= book.author.lastname%>, <%= book.author.firstname%></p>
+                <p><%= book.author.lastName%>, <%= book.author.firstName%></p>
               </li>
             <%}) %>
           <%} else { %>
