@@ -1,3 +1,19 @@
 <%- includes('layout'); %>
-<%{ content %>
-
+      <div class='book-list'>
+        <h1><%= title %></h1>
+        <ul>
+          <% if (Object.keys(book_list).length > 0) { %>
+            <% book_list.forEach((book) => { %>
+              <li>
+                <a href=<%= book.id %><%= book.title %></a>
+                <p><%= book.author.lastname%>, <%= book.author.firstname%></p>
+              </li>
+            <%}) %>
+          <%} else { %>
+            <li>There are no books.</li>
+          <%} %>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

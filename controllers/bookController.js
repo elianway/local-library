@@ -6,23 +6,23 @@ const async = require('async')
 exports.index = function(req, res) {
     async.parallel({
         book_count: function(callback) {
-            prisma.book.findMany({}, callback)
+            prisma.book.count({}, callback)
         },
         book_instance_count: function(callback) {
-            prisma.bookinstance.findMany({}, callback)
+            prisma.bookinstance.count({}, callback)
         },
         book_instance_available_count: function(callback) {
-            prisma.bookinstance.findMany({
+            prisma.bookinstance.count({
                 where: {
                   status: 'Available'
                 },
             }, callback)
         },
         author_count: function(callback) {
-            prisma.author.findMany({}, callback)
+            prisma.author.count({}, callback)
         },
         genre_count: function(callback) {
-            prisma.genre.findMany({}, callback)
+            prisma.genre.count({}, callback)
         }
     }, function(err, results) {
         res.render('index', { title: 'Local Library Home', error: err, data: results })
@@ -34,6 +34,7 @@ exports.book_list = function(req, res, next) {
     prisma.book.findMany({
         select: {
             title: true,
+            author: true,
         },
         include: {
             author: true,

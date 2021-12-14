@@ -20,17 +20,19 @@ model Author {
 }
 
 model Book {
-  id     Int    @id @default(autoincrement())
-  title  String
-  author Author @relation(fields: [authId], references: [id])
-  authId Int    @unique
-  genre  Genre  @relation(fields: [genId], references: [id])
-  genId  Int    @unique
+  id           Int            @id @default(autoincrement())
+  title        String
+  author       Author         @relation(fields: [authId], references: [id])
+  authId       Int            @unique
+  genre        Genre          @relation(fields: [genId], references: [id])
+  genId        Int            @unique
+  BookInstance BookInstance[]
 }
 
 model BookInstance {
   id      Int      @id @default(autoincrement())
-  book    String
+  book    Book     @relation(fields: [bookId], references: [id])
+  bookId  Int      @unique
   imprint String
   status  BookStat @default(MAINTENANCE)
   due     DateTime @default(now()) @db.Date
