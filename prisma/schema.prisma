@@ -22,6 +22,7 @@ model Author {
 model Book {
   id           Int            @id @default(autoincrement())
   title        String
+  summary      String
   author       Author         @relation(fields: [authId], references: [id])
   authId       Int            @unique
   genre        Genre          @relation(fields: [genId], references: [id])

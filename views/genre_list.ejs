@@ -5,7 +5,7 @@
           <%if (Object.keys(genre_list).length > 0) { %>
             <% genre_list.forEach((genre) => { %>
               <li>
-                <a href=<%= genre.id %><%= genre.name %></a>
+                <a href=<%= genre.id %>><%= genre.name %></a>
               </li>
             <%}) %>
           <%} else { %>

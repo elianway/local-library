@@ -49,8 +49,31 @@ exports.book_list = function(req, res, next) {
 };
 
 // Display detail page for a specific book.
-exports.book_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book detail: ' + req.params.id);
+exports.book_detail = function(req, res, next) {
+    async.parallel({
+        book: function(callback) {
+            prisma.book.findUnique({
+                where: {
+                    id: req.params.id
+                },
+            });
+        },
+        book_instance: function(callback) {
+            prisma.bookInstance.findMany({
+                where: {
+                    bookId: req.params.id
+                },
+            });
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        if (results.book==null) {
+            const err = new Error('Book not found');
+            err.status = 404;
+            return next(err);
+        }
+        res.render('book_detail', { title: results.book.title, book: results.book, book_instances: results.book_instance });
+    });        
 };
 
 // Display book create form on GET.

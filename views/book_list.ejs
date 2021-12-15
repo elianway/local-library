@@ -5,7 +5,7 @@
           <% if (Object.keys(book_list).length > 0) { %>
             <% book_list.forEach((book) => { %>
               <li>
-                <a href=<%= book.id %><%= book.title %></a>
+                <a href=<%= book.id %>><%= book.title %></a>
                 <p><%= book.author.lastName%>, <%= book.author.firstName%></p>
               </li>
             <%}) %>

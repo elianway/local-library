@@ -1,0 +1,33 @@
+<%- includes('layout'); %>
+      <div class='book-detail'>
+        <h1>Title: <%= title %></h1>
+        <br><br>
+        <p><b>Author: <a href=<%= book.authId %>><%= book.author.lastName %>, <%= book.author.firstName %></a></b></p>
+        <p><b>Summary: <%= book.summary %></b></p>
+        <p><b>ISBN: <%= book.id %></b></p>
+        <p><b>Genre: <%= book.genre %></b></p>
+        <div class='copies'>
+          <h4>Copies</h4>
+          <% if (Object.keys(book_instances) > 0) { %>
+            <% book_instances.forEach((instance) => { %>
+              <% if (instance.status=='AVAILABLE') { %>
+                <p class='text-success'><%= instance.status %></p>
+              <% } else if (instance.status=='MAINTENANCE') { %>
+                <p class='text-danger'><%= instance.status %></p>
+              <% } else { %>
+                <p class='text-warning'><%= instance.status %></p>
+              <% } %>
+            <% }); %>
+            <p><b>Imprint: <%= instance.imprint %></b></p>
+            <% if (instance.status != 'AVAILABLE') { %>
+              <p><b>Due back: <%= instance.due %></b></p>
+            <% } %>
+            <p><b>Id: <a href=<%= instance.id %>><%= instance.id %></a></b></p>
+          <% } else { %>
+            <p>There are no copies of this book in the library.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

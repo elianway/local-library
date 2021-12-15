@@ -7,7 +7,7 @@
             <% if (Object.keys(genre_books) > 0) { %>
               <% genre_books.forEach((book) => {
                 <li>
-                  <a href=<%= book.id %><%= book.title %></a>
+                  <a href=<%= book.id %>><%= book.title %></a>
                   <p><%= book.summary %></p>
                 </li>
               <%}); %>
