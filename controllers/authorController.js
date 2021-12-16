@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client')
-
+const async = require('async')
 const prisma = new PrismaClient()
 
 exports.author_list = function(req, res, next) {
@@ -13,8 +13,35 @@ exports.author_list = function(req, res, next) {
   });
 };
 
-exports.author_detail = function(req, res) {
-  res.send('NOT IMPLEMENTED: Author detail: ' + req.params.id);
+exports.author_detail = function(req, res, next) {
+  async.parallel({
+    author: function(callback) {
+      prisma.author.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+    },
+    author_books: function(callback) {
+      prisma.book.findUnique({
+        where: {
+          author: req.params.id,
+        },
+        select: {
+          title: true,
+          summary: true,
+        },
+      });
+    },
+  }, function(err, results) {
+    if (err) { return next(err); }
+    if (results.author==null) {
+      const err = new Error('Author not found');
+      err.status = 404;
+      return next(err);
+    }
+    res.render('author_detail', { title: 'Author Detail', author: results.author, author_books: results.author_books } );
+  }); 
 };
 
 exports.author_create_get = function(req, res) {
