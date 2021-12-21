@@ -1,0 +1,21 @@
+<%- includes('layout'); %>
+      <div class='bookinstance-detail'>
+        <h1>ID: <%= bookinstance.id %></h1>
+        <p><b>Title: <a href=<%= bookinstance.book.id %>><%= bookinstance.book.title %></a></b></p>
+        <p><b>Imprint: <%= bookinstance.imprint %></b></p>
+        <p><b>Status: 
+            <%if (bookinstance.status=='AVAILABLE') { %>
+              <span class='text-success'><%= bookinstance.status %></span>
+            <%} if (bookinstance.status=='MAINTENANCE') { %>
+              <span class='text-danger'><%= bookinstance.status %></span>
+            <%} else { %>
+              <span class='text-warning'><%= bookinstance.status %></span>
+            <%}%>
+        </b></p>
+        <%if (bookinstance.status!='AVAILABLE') { %>
+          <p><b>Due back: <%= bookinstance.due %></b></p>
+        <%} %>
+      </div>
+    </div>
+  </body>
+</html>
