@@ -1,0 +1,19 @@
+<%- includes('layout'); %>
+      <div class='author-detail'>
+        <h1>Author: <%= author.lastName %>, <%= author.firstName %></h1>
+        <p><%= author.bornOn %> - <%= author.diedOn %></p>
+        <div class='books'>
+          <h4>Books</h4>
+          <% if (Object.keys(author_books) > 0) { %>
+            <% author_books.forEach((book) => { %>
+              <a href=<%= book.id %>><%= book.title %></a>
+              <p><%= book.summary %></p>
+            <% }); %>
+          <% } else { %>
+            <p>This author has no books.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
