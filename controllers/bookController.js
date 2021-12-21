@@ -56,14 +56,14 @@ exports.book_detail = function(req, res, next) {
                 where: {
                     id: req.params.id
                 },
-            });
+            }, callback);
         },
         book_instance: function(callback) {
             prisma.bookInstance.findMany({
                 where: {
                     bookId: req.params.id
                 },
-            });
+            }, callback);
         },
     }, function(err, results) {
         if (err) { return next(err); }

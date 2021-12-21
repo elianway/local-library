@@ -20,7 +20,7 @@ exports.author_detail = function(req, res, next) {
         where: {
           id: req.params.id,
         },
-      });
+      }, callback);
     },
     author_books: function(callback) {
       prisma.book.findUnique({
@@ -31,7 +31,7 @@ exports.author_detail = function(req, res, next) {
           title: true,
           summary: true,
         },
-      });
+      }, callback);
     },
   }, function(err, results) {
     if (err) { return next(err); }
