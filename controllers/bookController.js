@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client')
+const { body, validationResult } = require('express-validator')
 
 const prisma = new PrismaClient()
 const async = require('async')
@@ -77,14 +78,95 @@ exports.book_detail = function(req, res, next) {
 };
 
 // Display book create form on GET.
-exports.book_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create GET');
+exports.book_create_get = function(req, res, next) {
+   
+    // Get all authors and genres, which we can use for adding to our book.
+    async.parallel({
+        authors: function(callback) {
+            prisma.author.findMany({}, callback);
+        }, 
+        genres: function(callback) {
+            prisma.genre.findMany({}, callback);
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        res.render('book_form', { title: 'Create Book', authors: results.authors, genres: results.genres });
+    });
+
 };
 
 // Handle book create on POST.
-exports.book_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create POST');
-};
+exports.book_create_post = [
+    // Convert the genre to an array.
+    (req, res, next) => {
+        if (!(req.body.genre instanceOf Array)) {
+            if (typeof req.body.genre === 'undefined')
+                req.body.genre = [];
+                else
+                req.body.genre = new Array(req.body.genre);
+        }
+        next();
+    },
+
+    // Validate and sanitize the fields.
+    body('title', 'Title must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('author', 'Author must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('summary', 'Summary must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('isbn', 'ISBN must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('genre.*').escape(),
+
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from the request.
+        const errors = validationResult(req);
+
+        // Create a book object with escaped and trimmed data.
+        var book = {
+            title: req.body.title,
+            author: req.body.author,
+            summary: req.body.summary,
+            isbn: req.body.isbn,
+            genre: req.body.genre
+        }
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+
+            // Get all authors and genres for form.
+            async.parallel({
+                authors: function(callback) {
+                    prisma.authors.findMany({}, callback);
+                },
+                genres: function(callback) {
+                    prisma.genres.findMany({}, callback);
+                },
+            }, function(e, results) {
+                if (e) { return next(e); }
+
+                // Mark our selected genres as checked.
+                for (let i = 0; i < results.genres.length; i++) {
+                    if (book.genre.indexOf(results.genres[i].id > -1)) {
+                        results.genres[i].checked='true';
+                    }
+                }
+                res.render('book_form', { title: 'Create Book', authors: results.authors, genres: results.genres, book: book, errors: errors.array() });
+            });
+            return;
+        }
+        else {
+            // Data from form is valid. Save book.
+            try {
+                const newBook = await prisma.book.create({ data: book });
+                res.redirect(newBook.id);
+            }
+            catch (e) {
+                if (e) { return next(e); }
+            }
+        }
+    }
+
+];
 
 // Display book delete form on GET.
 exports.book_delete_get = function(req, res) {
