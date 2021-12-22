@@ -1,0 +1,55 @@
+<%- includes('layout'); %>
+      <div class='author-form'>
+        <h1><%= title %></h1>
+        <form method='POST' action=''>
+          <div class='form-group'>
+            <label for='first_name'>First Name: </label>
+            <input 
+              id='first_name.form-control'
+              type='text'
+              placeholder='First name'
+              name='first_name'
+              value=<% author===undefined ? '' : author.first_name%>
+              required
+            />
+            <label for='last_name'>Last Name: </label>
+            <input 
+              id='last_name.form-control'
+              type='text'
+              placeholder='Last name'
+              name='last_name'
+              value=<% author===undefined ? '' : author.last_name%>
+              required
+            />
+          </div>
+          <div class='form-group'>
+            <label for='date_of_birth'>Date of birth: </label>
+            <input
+              id='date_of_birth.form-control'
+              type='date'
+              name='date_of_birth'
+              value=<% author===undefined ? '' : author.date_of_birth%>
+            />
+          </div>
+          <div class='form-group'>
+            <label for='date_of_death'>Date of death: </label>
+            <input
+              id='date_of_death.form-control'
+              type='date'
+              name='date_of_death'
+              value=<% author===undefined ? '' : author.date_of_death%>
+            />
+          </div>
+          <button class='btn.btn-primary' type='submit'>Submit</button>
+        </form>
+        <% if (errors) {%>
+          <ul>
+            <% for (error in errors) {%>
+              <li>=<%= error.msg%></li>
+            <% } %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

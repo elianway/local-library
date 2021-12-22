@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client')
+const { body, validationResult } = require('express-validator')
 const async = require('async')
 const prisma = new PrismaClient()
 
@@ -45,12 +46,50 @@ exports.author_detail = function(req, res, next) {
 };
 
 exports.author_create_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Author create GET');
+  res.render('author_form', { title: 'Create Author'});
 };
 
-exports.author_create_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: Author create POST');
-};
+exports.author_create_post = [
+  
+  // Validate and sanitize fields.
+  body('first_name').trim().isLength({ min: 1 }).escape().withMessage('First name must be specified.')
+    .isAlphanumeric().withMessage('Field must contain only letters or numbers.'),
+  body('family_name').trim().isLength({ min: 1 }).escape().withMessage('First name must be specified.')
+    .isAlphanumeric().withMessage('Field must contain only letters or numbers.'),
+  body('date_of_birth', 'Invalid date of birth').optional({ checkFalsy: true }).isISO8601().toDate(),
+  body('date_of_death', 'Invalid date of death').optional({ checkFalsy: true }).isISO8601().toDate(),
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      res.render('author_form', { title: 'Create Author', author: req.body, errors: errors.array() });
+      return;
+    }
+    else {
+      // Data from form is valid.
+      try {
+        const newAuthor = await prisma.author.create({
+          data: {
+            firstName: req.body.first_name,
+            lastName: req.body.last_name,
+            bornOn: req.body.date_of_birth,
+            diedOn: req.body.date_of_death
+          },
+        });
+        res.redirect(newAuthor.id);
+      }
+      catch (e) {
+        if (e) { return next(e); }
+      }
+    }
+  }
+];
+
 
 exports.author_delete_get = function(req, res) {
   res.send('NOT IMPLEMENTED: Author delete GET');
