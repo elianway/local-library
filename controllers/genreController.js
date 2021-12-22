@@ -1,6 +1,7 @@
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client');
+const { body, validationResult } = require('express-validator');
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 const async = require('async');
 
 // Display list of all Genre.
@@ -45,13 +46,58 @@ exports.genre_detail = function(req, res, next) {
 
 // Display Genre create form on GET.
 exports.genre_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre create GET');
+    res.render('genre_form', { title: 'Create Genre' }) 
 };
 
 // Handle Genre create on POST.
-exports.genre_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre create POST');
-};
+exports.genre_create_post = [
+
+    // Validate and sanitize the name field.
+    body('name', 'Genre name required').trim().isLength({ min: 1 }).escape(),
+
+    // Process request after validation and sanitization
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        const genre = { name: req.body.name };
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values
+            res.render('genre_form', { title: 'Create Genre', genre: genre, errors: errors.array()});
+        return;
+        }
+        else {
+            // Data from form is valid.
+            // Check if genre with same name already exists.
+            try {
+                const found_genre = await prisma.genre.findUnique({
+                    where: {
+                        name: req.body.name
+                    },
+                });
+                if (found_genre) {
+                    // Genre exists, redirect to detail page.
+                    res.redirect(found_genre.id);
+                } else {
+                    try {
+                        await prisma.genre.create({
+                            data: genre
+                        });
+                    }
+                    catch (e) {
+                        if (e) { return next(e); };
+                    }
+                }
+            } catch {
+                if (e) {
+                    return next(e);
+                }
+            }
+        }
+      }
+];
 
 // Display Genre delete form on GET.
 exports.genre_delete_get = function(req, res) {
