@@ -1,0 +1,28 @@
+<%- includes('layout'); %>
+      <div class='genre-form'>
+        <h1><%= title %></h1>
+        <form method='POST' action=''>
+          <div class='form-group'>
+            <label for='name'>Genre: </label>
+            <input 
+              id='name.form-control'
+              type='text'
+              placeholder='Fantasy, Poetry etc.'
+              name='name'
+              value=<% genre===undefinded ? '' : genre.name%>
+              required
+            />
+            <button class='btn.btn-primary' type='submit'>Submit</button>
+          </div>
+        </form>
+        <% if (errors) {%>
+          <ul>
+            <% for (error in errors) {%>
+              <li>=<%= error.msg%></li>
+            <% } %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>
