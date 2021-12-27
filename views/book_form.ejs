@@ -1,0 +1,82 @@
+<%- includes('layout'); %>
+      <div class='book-form'>
+        <h1><%= title %></h1>
+        <form method='POST' action=''>
+          <div class='form-group'>
+            <label for='title'>Title: </label>
+            <input 
+              id='title'
+              class='form-control'
+              type='text'
+              placeholder='Name of book'
+              name='title'
+              value=<% book===undefined ? '' : book.name%>
+              required
+            />
+          </div>
+          <div class='form-group'>
+            <label for='author'>Author: </label>
+            <select
+              id='author'
+              class='form-control'
+              type='select'
+              placeholder='Select author'
+              name='author'
+              required
+            />
+              <% authors.sort((function(a, b) {let textA = a.lastName.toUpperCase(); %>
+              <% let textB = b.lastName.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;}); %>
+              <% for (author in authors) { %>
+                <% if (book) { %>
+                  <option
+                    value=<%= author.id%>
+                    selected=<% author.id.toString()===book.author.id.toString() ? 'selected' : false %>
+                  ><%= author.name%>
+                  </option>
+                <% } else { %>
+                  <option value=<%= author.id %>><%= author.name %></option>
+                <% } %>
+              <% } %>
+            </select>
+          </div>
+          <div class='form-group'>
+            <label for='summary'>Summary: </label>
+            <textarea id='summary' class='form-control' type='textarea' placeholder='Summary'
+              name ='summary' required><%= book===undefined ? '' : book.summary%></textarea>
+          </div>
+          <div class='form-group'>
+            <label for='ISBN'>ISBN: </label>
+            <input id='isbn' class='form-control' type='text' placeholder='ISBN13' name='isbn'
+              value=<% book===undefined ? '' : book.isbn%> required />
+          </div>
+          <div class='form-group'>
+            <label>Genre: </label>
+            <div>
+              <% for (genre in genres) { %>
+                <div>
+                  <input 
+                    class='checkbox-input'
+                    type='checkbox'
+                    name='genre'
+                    id=<%= genre.id %>
+                    value=<%= genre.id %>
+                    checked=<%= genre.checked %>
+                  />
+                  <label for=<%= genre.id %>><%= genre.name %></label>
+                </div>
+              <% } %>
+            </div>
+          </div>
+          <button class='btn.btn-primary' type='submit'>Submit</button>
+        </form>
+        <% if (errors) {%>
+          <ul>
+            <% for (error in errors) {%>
+              <li>=<%= error.msg%></li>
+            <% } %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>
