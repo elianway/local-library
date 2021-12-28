@@ -1,3 +1,8 @@
+const { body, validationResult } = require('express-validator');
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
+
 // Display list of all BookInstances.
 exports.bookinstance_list = function(req, res, next) {
     prisma.bookinstance.findMany({
@@ -34,14 +39,62 @@ exports.bookinstance_detail = function(req, res, next) {
 };
 
 // Display BookInstance create form on GET.
-exports.bookinstance_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance create GET');
+exports.bookinstance_create_get = function(req, res, next) {
+    try {
+        const books = await prisma.book.findMany({ orderBy: { title: 'asc', }, });
+        res.render('bookinstance_form', { title: 'Create BookInstance', book_list: books });
+    }
+    catch (e) {
+        if (e) { return next(e); };
+    }
 };
 
 // Handle BookInstance create on POST.
-exports.bookinstance_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance create POST');
-};
+exports.bookinstance_create_post = [
+
+    // Validate and santise the fields.
+    body('book', 'Book must be specified').trim().isLength({ min: 1 }).escape(),
+    body('imprint', 'Imprint must be specified').trim().isLength({ min: 1 }).escape(),
+    body('status').escape(),
+    body('due_back', 'Invalid date').optional({ checkFalsy: true }).isISO8601().toDate(),
+
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a BookInstance object with escaped and trimmed data.
+        const bookinstance = {
+            book: req.body.book,
+            imprint: req.body.imprint,
+            status: req.body.status,
+            due_back: req.body.due_back
+        };
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values and error messages.
+            try {
+                const books = await prisma.book.findMany({ orderBy: { 'title': 'asc', }, });
+                res.render('bookinstance_form', { title: 'Create BookInstance', book_list: books, selected_book: bookinstance.book.id, errors: errors.array(), bookinstance: bookinstance });
+            }
+            catch (e) {
+                if (e) { return next(e); };
+            }
+            return;
+        }
+        else {
+            // Data from the form is valid.
+            try {
+                const newBookInstance = await prisma.bookinstance.create({ data: bookinstance });
+                res.redirect(newBookInstance.id);
+            }
+            catch (e) {
+                if (e) { return next(e); };
+            }
+        }
+    }
+];
 
 // Display BookInstance delete form on GET.
 exports.bookinstance_delete_get = function(req, res) {

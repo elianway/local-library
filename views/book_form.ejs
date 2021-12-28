@@ -30,7 +30,7 @@
                 <% if (book) { %>
                   <option
                     value=<%= author.id%>
-                    selected=<% author.id.toString()===book.author.id.toString() ? 'selected' : false %>
+                    selected=<% (author.id.toString()===book.author.id.toString()) ? 'selected' : false %>
                   ><%= author.name%>
                   </option>
                 <% } else { %>
