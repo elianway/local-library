@@ -28,9 +28,11 @@
               <% let textB = b.lastName.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;}); %>
               <% for (author in authors) { %>
                 <% if (book) { %>
+                  // Handle GET form, where book.author is an object, and POST form, where it's a string.
                   <option
                     value=<%= author.id%>
-                    selected=<% (author.id.toString()===book.author.id.toString()) ? 'selected' : false %>
+                    selected=<% (author.id.toString()===book.author.id.toString() ||
+                    author.id.toString()==book.author) ? 'selected' : false %>
                   ><%= author.name%>
                   </option>
                 <% } else { %>
