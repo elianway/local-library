@@ -90,13 +90,76 @@ exports.author_create_post = [
   }
 ];
 
+// Display author delete form on GET.
+exports.author_delete_get = function(req, res, next) { 
+  
+  async.parallel({
+    author: function(callback) {
+      prisma.author.findUnique({
+        where: {
+          id: req.params.id        
+        },
+      }, callback)
+    },
+    authors_books: function(callback) {
+      prisma.book.findMany({
+        where: {
+          authId: req.params.id
+        },
+      }, callback)
+    },
+  }, function(e, results) {
+    if (e) { return next(e); }
+    if (results.author==null) { // No results.
+      res.redirect('/catalog/authors');
+    }
+    // Successful, so render.
+    res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.author_books } );
+  });
 
-exports.author_delete_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Author delete GET');
 };
 
-exports.author_delete_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: Author delete POST');
+// Handle author delete on POST.
+exports.author_delete_post = function(req, res, next) {
+  
+ async.parallel({
+        author: function(callback) {
+          prisma.author.findUnique({
+            where: {
+              id: req.body.authorid
+            },
+          }, callback)
+        },
+        authors_books: function(callback) {
+          prisma.book.findMany({
+            where: {
+              authId: req.body.authorid
+            },
+          }, callback)
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        // Success
+        if (results.authors_books.length > 0) {
+            // Author has books. Render in same way as for GET route.
+            res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+            return;
+        }
+        else {
+            // Author has no books. Delete object and redirect to the list of authors.
+          try {
+            await prisma.author.delete({
+              where: {
+                id: req.body.authorid
+              },
+            })
+            res.redirect('/catalog/authors')
+          }
+          catch (e) {
+            if (e) { return next(e); }
+          }
+        }
+    });
 };
 
 exports.author_update_get = function(req, res) {
