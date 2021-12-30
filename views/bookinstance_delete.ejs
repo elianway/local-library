@@ -1,0 +1,14 @@
+<%- includes('layout'); %>
+      <div class='bookinstance-delete'>
+        <h1><%= title %>: <%= book_instance.id %></h1>
+        <p>Do you really want to delete this copy?</p>
+          <form method='POST' action=''>
+            <div class='form-group'>
+              <input id='instanceid' class='form-control' type='hidden' name='instanceid' value=<%= book_instance.id %> required />
+              <button class='btn btn-primary' type='submit'>Delete</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </body>
+</html>
