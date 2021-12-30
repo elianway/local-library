@@ -1,13 +1,12 @@
 <%- includes('layout'); %>
-      <div class='author-delete'>
-        <h1><%= title %>: <%= author.lastName %>, <%= author.firstName %></h1>
-        <p><%= author.bornOn %> - <%= author.diedOn %></p>
-        <% if (author_books.length) { %>
-          <p><b>Delete the following books before attempting to delete this author.</b></p>
+      <div class='genre-delete'>
+        <h1><%= title %>: <%= genre.name %></h1>
+        <% if (genre_books.length) { %>
+          <p><b>Delete the following books before attempting to delete this genre.</b></p>
           <div style='margin-left:20px;margin-top:20px;'>
             <h4>Books</h4>
             <dl>
-            <% author_books.forEach((book) => { %>
+            <% genre_books.forEach((book) => { %>
               <dt><a href=<%= book.id %>><%= book.title %></a></dt>
               <dd><%= book.summary %></dd>
             <% }); %>

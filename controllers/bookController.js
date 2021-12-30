@@ -169,13 +169,78 @@ exports.book_create_post = [
 ];
 
 // Display book delete form on GET.
-exports.book_delete_get = function(req, res) {
-
+exports.book_delete_get = function(req, res, next) {
+   async.parallel({
+       book: function(callback) {
+           prisma.book.findUnique({
+             where: {
+                 id: req.params.id
+             },
+             include: {
+                 author: true
+             },
+           }, callback)
+       },
+       book_instances: function(callback) {
+           prisma.bookinstance.findMany({
+               where: {
+                   bookId: req.params.id
+               },
+           }, callback)
+       },
+   }, function(e, results) {
+       if (e) { return next(e); }
+       if (results.book==null) { // No results.
+           res.redirect('/catalog/books');
+       }
+       // Successful, so render.
+       res.render('book_delete', { title: 'Delete Book', book: results.book, book_instances: results.book_instances } );
+   });
 };
 
 // Handle book delete on POST.
-exports.book_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book delete POST');
+exports.book_delete_post = function(req, res, next) {
+   async.parallel({
+       book: function(callback) {
+           prisma.book.findUnique({
+             where: {
+                 id: req.body.bookid 
+             },
+             include: {
+                 author: true
+             },
+           }, callback)
+       },
+       book_instances: function(callback) {
+           prisma.bookinstance.findMany({
+               where: {
+                   bookId: req.body.bookid
+               },
+           }, callback)
+       },
+   }, function(e, results) {
+       if (e) { return next(e); }
+       // Success
+       if (results.book_instances.length > 0) {
+          // Book has instances. Render is same way as for GET route.
+           res.render('book_delete', { title: 'Delete Book', book: results.book, book_instances: results.book_instances } );
+           return;
+       }
+       else {
+           // Book has no instances. Delete Book and redirect to the list of books.
+           try {
+               await prisma.book.delete({
+                 where: {
+                   id: req.body.bookid
+                 },
+               })
+               res.redirect('/catalog/books')
+           }
+           catch (e) {
+               if (e) { return next(e); }
+           }
+       }
+   });
 };
 
 // Display book update form on GET.

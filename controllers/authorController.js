@@ -101,7 +101,7 @@ exports.author_delete_get = function(req, res, next) {
         },
       }, callback)
     },
-    authors_books: function(callback) {
+    author_books: function(callback) {
       prisma.book.findMany({
         where: {
           authId: req.params.id
@@ -146,7 +146,7 @@ exports.author_delete_post = function(req, res, next) {
             return;
         }
         else {
-            // Author has no books. Delete object and redirect to the list of authors.
+          // Author has no books. Delete object and redirect to the list of authors.
           try {
             await prisma.author.delete({
               where: {

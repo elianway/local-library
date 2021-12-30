@@ -100,13 +100,73 @@ exports.genre_create_post = [
 ];
 
 // Display Genre delete form on GET.
-exports.genre_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre delete GET');
+exports.genre_delete_get = function(req, res, next) {
+  async.parallel({
+    genre: function(callback) {
+      prisma.genre.findUnique({
+        where: {
+          id: req.params.id        
+        },
+      }, callback)
+    },
+    genre_books: function(callback) {
+      prisma.book.findMany({
+        where: {
+          genId: req.params.id
+        },
+      }, callback)
+    },
+  }, function(e, results) {
+    if (e) { return next(e); }
+    if (results.genre==null) { // No results.
+      res.redirect('/catalog/genres');
+    }
+    // Successful, so render.
+    res.render('genre_delete', { title: 'Delete Genre', genre: results.genre, genre_books: results.genre_books } );
+  });
+
 };
 
 // Handle Genre delete on POST.
-exports.genre_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre delete POST');
+exports.genre_delete_post = function(req, res, next) {
+ async.parallel({
+        genre: function(callback) {
+          prisma.genre.findUnique({
+            where: {
+              id: req.body.genreid
+            },
+          }, callback)
+        },
+        genres_books: function(callback) {
+          prisma.book.findMany({
+            where: {
+              genId: req.body.genreid
+            },
+          }, callback)
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        // Success
+        if (results.genres_books.length > 0) {
+            // Genre has books. Render in same way as for GET route.
+            res.render('genre_delete', { title: 'Delete Genre', genre: results.genre, genre_books: results.genres_books } );
+            return;
+        }
+        else {
+          // Genre has no books. Delete object and redirect to the list of authors.
+          try {
+            await prisma.genre.delete({
+              where: {
+                id: req.body.genreid
+              },
+            })
+            res.redirect('/catalog/genres')
+          }
+          catch (e) {
+            if (e) { return next(e); }
+          }
+        }
+    });
 };
 
 // Display Genre update form on GET.
